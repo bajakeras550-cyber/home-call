@@ -6,6 +6,8 @@
 
   <title>Home Call</title>
 
+  <script src="https://cdn.jsdelivr.net/npm/peerjs@1.5.5/dist/peerjs.min.js"></script>
+
   <style>
     * {
       box-sizing: border-box;
@@ -15,228 +17,439 @@
 
     body {
       min-height: 100vh;
-      font-family: Arial, sans-serif;
       background: #080b12;
       color: white;
-      display: flex;
-      justify-content: center;
-      align-items: center;
+      font-family: Arial, sans-serif;
     }
 
     .app {
       width: 100%;
-      max-width: 430px;
+      max-width: 500px;
       min-height: 100vh;
-      padding: 25px 20px;
-      display: flex;
-      flex-direction: column;
+      margin: auto;
+      padding: 20px;
     }
 
-    .top {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
+    h1 {
+      margin-bottom: 8px;
     }
 
-    .logo {
-      font-size: 24px;
-      font-weight: bold;
+    .status {
+      color: #22c55e;
+      margin-bottom: 20px;
     }
 
-    .online {
-      display: flex;
-      align-items: center;
-      gap: 7px;
-      font-size: 13px;
-      color: #9ca3af;
-    }
-
-    .dot {
-      width: 9px;
-      height: 9px;
-      background: #22c55e;
-      border-radius: 50%;
-      box-shadow: 0 0 10px #22c55e;
-    }
-
-    .welcome {
-      margin-top: 70px;
-    }
-
-    .welcome small {
-      color: #8b93a7;
-      font-size: 15px;
-    }
-
-    .welcome h1 {
-      margin-top: 8px;
-      font-size: 36px;
-      line-height: 1.1;
-    }
-
-    .welcome p {
-      margin-top: 15px;
-      color: #8b93a7;
-      line-height: 1.6;
-    }
-
-    .call-card {
-      margin-top: 45px;
-      padding: 25px;
-      border-radius: 25px;
+    .box {
       background: #111722;
       border: 1px solid #202938;
-    }
-
-    .camera {
-      height: 180px;
       border-radius: 20px;
+      padding: 20px;
+      margin-bottom: 15px;
+    }
+
+    .id {
+      word-break: break-all;
       background: #080b12;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      font-size: 55px;
-      margin-bottom: 22px;
+      padding: 12px;
+      border-radius: 10px;
+      margin: 10px 0;
+      color: #60a5fa;
     }
 
-    .call-card h2 {
-      font-size: 20px;
-    }
-
-    .call-card p {
-      color: #7f899d;
-      margin-top: 7px;
-      font-size: 14px;
-    }
-
-    .call-button {
+    input {
       width: 100%;
-      margin-top: 22px;
-      padding: 17px;
+      padding: 15px;
       border: none;
-      border-radius: 15px;
-      background: #2563eb;
-      color: white;
-      font-size: 17px;
+      border-radius: 12px;
+      margin: 8px 0;
+      font-size: 16px;
+    }
+
+    button {
+      width: 100%;
+      padding: 15px;
+      border: none;
+      border-radius: 12px;
+      margin-top: 8px;
+      font-size: 16px;
       font-weight: bold;
       cursor: pointer;
-      transition: 0.2s;
     }
 
-    .call-button:active {
-      transform: scale(0.97);
+    .blue {
+      background: #2563eb;
+      color: white;
     }
 
-    .features {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 10px;
-      margin-top: 20px;
+    .green {
+      background: #16a34a;
+      color: white;
     }
 
-    .feature {
-      padding: 15px 8px;
-      text-align: center;
-      background: #111722;
-      border: 1px solid #202938;
-      border-radius: 16px;
+    .red {
+      background: #dc2626;
+      color: white;
     }
 
-    .feature span {
-      font-size: 23px;
+    video {
+      width: 100%;
+      background: #000;
+      border-radius: 15px;
+      margin-top: 10px;
     }
 
-    .feature p {
-      margin-top: 7px;
-      font-size: 11px;
+    #incoming {
+      display: none;
+      border: 1px solid #f59e0b;
+    }
+
+    #callArea {
+      display: none;
+    }
+
+    #remoteVideo {
+      min-height: 250px;
+    }
+
+    #localVideo {
+      max-height: 220px;
+    }
+
+    .small {
       color: #8b93a7;
-    }
-
-    .footer {
-      margin-top: auto;
-      padding-top: 30px;
-      text-align: center;
-      color: #596275;
-      font-size: 12px;
+      font-size: 13px;
+      line-height: 1.5;
     }
   </style>
 </head>
 
 <body>
 
-  <main class="app">
+<div class="app">
 
-    <div class="top">
-      <div class="logo">Home Call</div>
+  <h1>📹 Home Call</h1>
+  <div class="status" id="status">Menghubungkan...</div>
 
-      <div class="online">
-        <div class="dot"></div>
-        Online
-      </div>
+  <div class="box">
+    <h2>👤 ID Kamu</h2>
+
+    <div class="id" id="myId">
+      Menunggu ID...
     </div>
 
-    <section class="welcome">
-      <small>Selamat datang 👋</small>
+    <button class="blue" onclick="copyId()">
+      📋 Salin ID
+    </button>
 
-      <h1>
-        Hubungi<br>
-        saya sekarang.
-      </h1>
+    <p class="small">
+      Jika kamu adalah pemilik, kirim ID ini kepada tamu
+      yang ingin melakukan video call.
+    </p>
+  </div>
 
-      <p>
-        Tekan tombol di bawah untuk memulai
-        panggilan video.
-      </p>
-    </section>
 
-    <section class="call-card">
+  <div class="box">
+    <h2>📞 Panggil Pemilik</h2>
 
-      <div class="camera">
-        📹
-      </div>
+    <input
+      id="remoteId"
+      type="text"
+      placeholder="Masukkan ID pemilik"
+    >
 
-      <h2>Video Call</h2>
+    <button class="green" onclick="startCall()">
+      📞 Mulai Video Call
+    </button>
+  </div>
 
-      <p>
-        Kamera dan mikrofon siap digunakan.
-      </p>
 
-      <button class="call-button" onclick="startCall()">
-        📞 Mulai Video Call
-      </button>
+  <div class="box" id="incoming">
 
-    </section>
+    <h2>📲 Panggilan Masuk!</h2>
 
-    <section class="features">
+    <p id="callerText">
+      Seseorang sedang memanggil...
+    </p>
 
-      <div class="feature">
-        <span>🎥</span>
-        <p>Video</p>
-      </div>
+    <button class="green" onclick="answerCall()">
+      ✅ Terima
+    </button>
 
-      <div class="feature">
-        <span>🎙️</span>
-        <p>Audio</p>
-      </div>
+    <button class="red" onclick="rejectCall()">
+      ❌ Tolak
+    </button>
 
-      <div class="feature">
-        <span>🔒</span>
-        <p>Aman</p>
-      </div>
+  </div>
 
-    </section>
 
-    <div class="footer">
-      Home Call • Video Communication
-    </div>
+  <div class="box" id="callArea">
 
-  </main>
+    <h2>🎥 Video Call</h2>
 
-  <script>
-    function startCall() {
-      alert("Fitur Video Call akan segera dimulai.");
+    <video
+      id="remoteVideo"
+      autoplay
+      playsinline>
+    </video>
+
+    <video
+      id="localVideo"
+      autoplay
+      muted
+      playsinline>
+    </video>
+
+    <button class="red" onclick="endCall()">
+      🔴 Akhiri Panggilan
+    </button>
+
+  </div>
+
+</div>
+
+
+<script>
+
+  let peer;
+  let localStream = null;
+  let currentCall = null;
+  let incomingCall = null;
+
+
+  // Membuat ID otomatis
+  peer = new Peer();
+
+
+  peer.on("open", function(id) {
+
+    document.getElementById("myId").textContent = id;
+
+    document.getElementById("status").textContent =
+      "🟢 Online";
+
+  });
+
+
+  // Kalau ada orang menelepon
+  peer.on("call", function(call) {
+
+    incomingCall = call;
+
+    document.getElementById("incoming").style.display = "block";
+
+    document.getElementById("callerText").textContent =
+      "Panggilan dari ID: " + call.peer;
+
+  });
+
+
+  // Kalau terjadi error
+  peer.on("error", function(error) {
+
+    console.error(error);
+
+    document.getElementById("status").textContent =
+      "🔴 Terjadi masalah koneksi";
+
+    alert("Koneksi gagal: " + error.type);
+
+  });
+
+
+  // Meminta kamera + mikrofon
+  async function getCamera() {
+
+    try {
+
+      localStream =
+        await navigator.mediaDevices.getUserMedia({
+
+          video: true,
+          audio: true
+
+        });
+
+      document.getElementById("localVideo").srcObject =
+        localStream;
+
+      return true;
+
+    } catch (error) {
+
+      alert(
+        "Kamera atau mikrofon tidak bisa digunakan.\n\n" +
+        error.message
+      );
+
+      return false;
     }
-  </script>
+  }
+
+
+  // Tamu menelepon pemilik
+  async function startCall() {
+
+    const remoteId =
+      document.getElementById("remoteId").value.trim();
+
+    if (!remoteId) {
+
+      alert("Masukkan ID pemilik terlebih dahulu.");
+
+      return;
+    }
+
+
+    const ready = await getCamera();
+
+    if (!ready) return;
+
+
+    currentCall =
+      peer.call(remoteId, localStream);
+
+
+    setupCall(currentCall);
+
+  }
+
+
+  // Pemilik menerima panggilan
+  async function answerCall() {
+
+    if (!incomingCall) return;
+
+
+    const ready = await getCamera();
+
+    if (!ready) return;
+
+
+    incomingCall.answer(localStream);
+
+    currentCall = incomingCall;
+
+    incomingCall = null;
+
+    document.getElementById("incoming").style.display =
+      "none";
+
+    setupCall(currentCall);
+
+  }
+
+
+  // Menyiapkan video panggilan
+  function setupCall(call) {
+
+    document.getElementById("callArea").style.display =
+      "block";
+
+
+    call.on("stream", function(remoteStream) {
+
+      document.getElementById("remoteVideo").srcObject =
+        remoteStream;
+
+    });
+
+
+    call.on("close", function() {
+
+      endCall();
+
+    });
+
+
+    call.on("error", function(error) {
+
+      console.error(error);
+
+      alert("Panggilan gagal.");
+
+      endCall();
+
+    });
+
+  }
+
+
+  // Tolak panggilan
+  function rejectCall() {
+
+    if (incomingCall) {
+
+      incomingCall.close();
+
+      incomingCall = null;
+
+    }
+
+    document.getElementById("incoming").style.display =
+      "none";
+
+  }
+
+
+  // Akhiri panggilan
+  function endCall() {
+
+    if (currentCall) {
+
+      currentCall.close();
+
+      currentCall = null;
+
+    }
+
+
+    if (localStream) {
+
+      localStream.getTracks().forEach(function(track) {
+
+        track.stop();
+
+      });
+
+      localStream = null;
+
+    }
+
+
+    document.getElementById("localVideo").srcObject =
+      null;
+
+    document.getElementById("remoteVideo").srcObject =
+      null;
+
+    document.getElementById("callArea").style.display =
+      "none";
+
+  }
+
+
+  // Salin ID
+  function copyId() {
+
+    const id =
+      document.getElementById("myId").textContent;
+
+    if (!id || id === "Menunggu ID...") {
+
+      alert("Tunggu sampai ID muncul.");
+
+      return;
+
+    }
+
+
+    navigator.clipboard.writeText(id);
+
+    alert("ID berhasil disalin!");
+
+  }
+
+</script>
 
 </body>
 </html>
