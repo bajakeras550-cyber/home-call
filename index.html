@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <title>Home Call</title>
+  <title>Home Call - Panggil</title>
 
   <script src="https://cdn.jsdelivr.net/npm/peerjs@1.5.5/dist/peerjs.min.js"></script>
 
@@ -16,73 +16,48 @@
     }
 
     body {
-      min-height: 100vh;
       background: #080b12;
       color: white;
       font-family: Arial, sans-serif;
+      min-height: 100vh;
     }
 
     .app {
-      width: 100%;
       max-width: 500px;
-      min-height: 100vh;
       margin: auto;
-      padding: 20px;
+      padding: 25px 20px;
     }
 
     h1 {
-      margin-bottom: 8px;
+      margin-bottom: 10px;
     }
 
-    .status {
-      color: #22c55e;
-      margin-bottom: 20px;
-    }
-
-    .box {
+    .card {
       background: #111722;
       border: 1px solid #202938;
-      border-radius: 20px;
-      padding: 20px;
-      margin-bottom: 15px;
+      border-radius: 22px;
+      padding: 25px;
+      margin-top: 25px;
     }
 
-    .id {
-      word-break: break-all;
-      background: #080b12;
-      padding: 12px;
-      border-radius: 10px;
-      margin: 10px 0;
-      color: #60a5fa;
-    }
-
-    input {
-      width: 100%;
-      padding: 15px;
-      border: none;
-      border-radius: 12px;
-      margin: 8px 0;
-      font-size: 16px;
+    .icon {
+      font-size: 70px;
+      text-align: center;
+      margin: 20px;
     }
 
     button {
       width: 100%;
-      padding: 15px;
-      border: none;
-      border-radius: 12px;
-      margin-top: 8px;
-      font-size: 16px;
+      padding: 17px;
+      border: 0;
+      border-radius: 15px;
+      margin-top: 15px;
+      font-size: 17px;
       font-weight: bold;
-      cursor: pointer;
     }
 
     .blue {
       background: #2563eb;
-      color: white;
-    }
-
-    .green {
-      background: #16a34a;
       color: white;
     }
 
@@ -98,27 +73,12 @@
       margin-top: 10px;
     }
 
-    #incoming {
-      display: none;
-      border: 1px solid #f59e0b;
-    }
-
     #callArea {
       display: none;
     }
 
-    #remoteVideo {
-      min-height: 250px;
-    }
-
-    #localVideo {
-      max-height: 220px;
-    }
-
-    .small {
-      color: #8b93a7;
-      font-size: 13px;
-      line-height: 1.5;
+    #status {
+      color: #22c55e;
     }
   </style>
 </head>
@@ -128,76 +88,43 @@
 <div class="app">
 
   <h1>📹 Home Call</h1>
-  <div class="status" id="status">Menghubungkan...</div>
 
-  <div class="box">
-    <h2>👤 ID Kamu</h2>
+  <p id="status">
+    Siap melakukan panggilan
+  </p>
 
-    <div class="id" id="myId">
-      Menunggu ID...
-    </div>
+  <div class="card" id="home">
 
-    <button class="blue" onclick="copyId()">
-      📋 Salin ID
-    </button>
+    <div class="icon">🏠</div>
 
-    <p class="small">
-      Jika kamu adalah pemilik, kirim ID ini kepada tamu
-      yang ingin melakukan video call.
+    <h2 style="text-align:center;">
+      Hubungi Pemilik
+    </h2>
+
+    <p style="text-align:center;margin-top:12px;color:#8b93a7;">
+      Tekan tombol di bawah untuk melakukan
+      video call.
     </p>
-  </div>
 
-
-  <div class="box">
-    <h2>📞 Panggil Pemilik</h2>
-
-    <input
-      id="remoteId"
-      type="text"
-      placeholder="Masukkan ID pemilik"
-    >
-
-    <button class="green" onclick="startCall()">
+    <button class="blue" onclick="startCall()">
       📞 Mulai Video Call
     </button>
-  </div>
-
-
-  <div class="box" id="incoming">
-
-    <h2>📲 Panggilan Masuk!</h2>
-
-    <p id="callerText">
-      Seseorang sedang memanggil...
-    </p>
-
-    <button class="green" onclick="answerCall()">
-      ✅ Terima
-    </button>
-
-    <button class="red" onclick="rejectCall()">
-      ❌ Tolak
-    </button>
 
   </div>
 
 
-  <div class="box" id="callArea">
+  <div class="card" id="callArea">
 
     <h2>🎥 Video Call</h2>
 
-    <video
-      id="remoteVideo"
-      autoplay
-      playsinline>
-    </video>
+    <video id="remoteVideo"
+           autoplay
+           playsinline></video>
 
-    <video
-      id="localVideo"
-      autoplay
-      muted
-      playsinline>
-    </video>
+    <video id="localVideo"
+           autoplay
+           muted
+           playsinline></video>
 
     <button class="red" onclick="endCall()">
       🔴 Akhiri Panggilan
@@ -211,193 +138,87 @@
 <script>
 
   let peer;
-  let localStream = null;
   let currentCall = null;
-  let incomingCall = null;
+  let localStream = null;
 
-
-  // Membuat ID otomatis
+  // ID TAMU dibuat otomatis
   peer = new Peer();
 
 
   peer.on("open", function(id) {
 
-    document.getElementById("myId").textContent = id;
-
     document.getElementById("status").textContent =
-      "🟢 Online";
+      "🟢 Siap menelepon";
 
   });
 
 
-  // Kalau ada orang menelepon
-  peer.on("call", function(call) {
-
-    incomingCall = call;
-
-    document.getElementById("incoming").style.display = "block";
-
-    document.getElementById("callerText").textContent =
-      "Panggilan dari ID: " + call.peer;
-
-  });
-
-
-  // Kalau terjadi error
-  peer.on("error", function(error) {
-
-    console.error(error);
-
-    document.getElementById("status").textContent =
-      "🔴 Terjadi masalah koneksi";
-
-    alert("Koneksi gagal: " + error.type);
-
-  });
-
-
-  // Meminta kamera + mikrofon
-  async function getCamera() {
+  async function startCall() {
 
     try {
 
       localStream =
         await navigator.mediaDevices.getUserMedia({
-
           video: true,
           audio: true
-
         });
 
       document.getElementById("localVideo").srcObject =
         localStream;
 
-      return true;
+
+      // ID PEMILIK
+      currentCall =
+        peer.call(
+          "homecall-owner-2026",
+          localStream
+        );
+
+
+      document.getElementById("home").style.display =
+        "none";
+
+      document.getElementById("callArea").style.display =
+        "block";
+
+      document.getElementById("status").textContent =
+        "📞 Memanggil pemilik...";
+
+
+      currentCall.on("stream", function(remoteStream) {
+
+        document.getElementById("remoteVideo").srcObject =
+          remoteStream;
+
+        document.getElementById("status").textContent =
+          "🟢 Terhubung";
+
+      });
+
+
+      currentCall.on("close", function() {
+
+        endCall();
+
+      });
+
 
     } catch (error) {
 
       alert(
-        "Kamera atau mikrofon tidak bisa digunakan.\n\n" +
-        error.message
+        "Kamera atau mikrofon tidak bisa digunakan."
       );
 
-      return false;
-    }
-  }
-
-
-  // Tamu menelepon pemilik
-  async function startCall() {
-
-    const remoteId =
-      document.getElementById("remoteId").value.trim();
-
-    if (!remoteId) {
-
-      alert("Masukkan ID pemilik terlebih dahulu.");
-
-      return;
     }
 
-
-    const ready = await getCamera();
-
-    if (!ready) return;
-
-
-    currentCall =
-      peer.call(remoteId, localStream);
-
-
-    setupCall(currentCall);
-
   }
 
 
-  // Pemilik menerima panggilan
-  async function answerCall() {
-
-    if (!incomingCall) return;
-
-
-    const ready = await getCamera();
-
-    if (!ready) return;
-
-
-    incomingCall.answer(localStream);
-
-    currentCall = incomingCall;
-
-    incomingCall = null;
-
-    document.getElementById("incoming").style.display =
-      "none";
-
-    setupCall(currentCall);
-
-  }
-
-
-  // Menyiapkan video panggilan
-  function setupCall(call) {
-
-    document.getElementById("callArea").style.display =
-      "block";
-
-
-    call.on("stream", function(remoteStream) {
-
-      document.getElementById("remoteVideo").srcObject =
-        remoteStream;
-
-    });
-
-
-    call.on("close", function() {
-
-      endCall();
-
-    });
-
-
-    call.on("error", function(error) {
-
-      console.error(error);
-
-      alert("Panggilan gagal.");
-
-      endCall();
-
-    });
-
-  }
-
-
-  // Tolak panggilan
-  function rejectCall() {
-
-    if (incomingCall) {
-
-      incomingCall.close();
-
-      incomingCall = null;
-
-    }
-
-    document.getElementById("incoming").style.display =
-      "none";
-
-  }
-
-
-  // Akhiri panggilan
   function endCall() {
 
     if (currentCall) {
 
       currentCall.close();
-
       currentCall = null;
 
     }
@@ -406,9 +227,7 @@
     if (localStream) {
 
       localStream.getTracks().forEach(function(track) {
-
         track.stop();
-
       });
 
       localStream = null;
@@ -416,36 +235,20 @@
     }
 
 
-    document.getElementById("localVideo").srcObject =
+    document.getElementById("remoteVideo").srcObject =
       null;
 
-    document.getElementById("remoteVideo").srcObject =
+    document.getElementById("localVideo").srcObject =
       null;
 
     document.getElementById("callArea").style.display =
       "none";
 
-  }
+    document.getElementById("home").style.display =
+      "block";
 
-
-  // Salin ID
-  function copyId() {
-
-    const id =
-      document.getElementById("myId").textContent;
-
-    if (!id || id === "Menunggu ID...") {
-
-      alert("Tunggu sampai ID muncul.");
-
-      return;
-
-    }
-
-
-    navigator.clipboard.writeText(id);
-
-    alert("ID berhasil disalin!");
+    document.getElementById("status").textContent =
+      "Siap melakukan panggilan";
 
   }
 
