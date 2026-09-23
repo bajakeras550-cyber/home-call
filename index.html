@@ -1,16 +1,49 @@
 <!DOCTYPE html>
-<html>
+<html lang="id">
 <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Video Call</title>
 </head>
-<body>
-  <h1>Video Call Saya</h1>
 
-  <video id="localVideo" autoplay muted playsinline></video>
-  <video id="remoteVideo" autoplay playsinline></video>
+<body>
+
+  <h1>📹 Video Call</h1>
+
+  <video id="localVideo" autoplay muted playsinline
+         style="width:90%;max-width:500px;"></video>
 
   <br><br>
-  <button id="callButton">📞 Panggil</button>
-  <button id="hangupButton">❌ Tutup</button>
+
+  <button onclick="startCamera()">📷 Nyalakan Kamera</button>
+  <button onclick="stopCamera()">❌ Matikan Kamera</button>
+
+  <script>
+    let stream = null;
+
+    async function startCamera() {
+      try {
+        stream = await navigator.mediaDevices.getUserMedia({
+          video: true,
+          audio: true
+        });
+
+        document.getElementById("localVideo").srcObject = stream;
+
+      } catch (error) {
+        alert("Tidak bisa membuka kamera: " + error.message);
+      }
+    }
+
+    function stopCamera() {
+      if (stream) {
+        stream.getTracks().forEach(track => track.stop());
+        stream = null;
+      }
+
+      document.getElementById("localVideo").srcObject = null;
+    }
+  </script>
+
 </body>
 </html>
