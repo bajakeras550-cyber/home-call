@@ -3,45 +3,238 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Video Call</title>
+
+  <title>Home Call</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      min-height: 100vh;
+      font-family: Arial, sans-serif;
+      background: #080b12;
+      color: white;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .app {
+      width: 100%;
+      max-width: 430px;
+      min-height: 100vh;
+      padding: 25px 20px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .logo {
+      font-size: 24px;
+      font-weight: bold;
+    }
+
+    .online {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      font-size: 13px;
+      color: #9ca3af;
+    }
+
+    .dot {
+      width: 9px;
+      height: 9px;
+      background: #22c55e;
+      border-radius: 50%;
+      box-shadow: 0 0 10px #22c55e;
+    }
+
+    .welcome {
+      margin-top: 70px;
+    }
+
+    .welcome small {
+      color: #8b93a7;
+      font-size: 15px;
+    }
+
+    .welcome h1 {
+      margin-top: 8px;
+      font-size: 36px;
+      line-height: 1.1;
+    }
+
+    .welcome p {
+      margin-top: 15px;
+      color: #8b93a7;
+      line-height: 1.6;
+    }
+
+    .call-card {
+      margin-top: 45px;
+      padding: 25px;
+      border-radius: 25px;
+      background: #111722;
+      border: 1px solid #202938;
+    }
+
+    .camera {
+      height: 180px;
+      border-radius: 20px;
+      background: #080b12;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 55px;
+      margin-bottom: 22px;
+    }
+
+    .call-card h2 {
+      font-size: 20px;
+    }
+
+    .call-card p {
+      color: #7f899d;
+      margin-top: 7px;
+      font-size: 14px;
+    }
+
+    .call-button {
+      width: 100%;
+      margin-top: 22px;
+      padding: 17px;
+      border: none;
+      border-radius: 15px;
+      background: #2563eb;
+      color: white;
+      font-size: 17px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+
+    .call-button:active {
+      transform: scale(0.97);
+    }
+
+    .features {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      margin-top: 20px;
+    }
+
+    .feature {
+      padding: 15px 8px;
+      text-align: center;
+      background: #111722;
+      border: 1px solid #202938;
+      border-radius: 16px;
+    }
+
+    .feature span {
+      font-size: 23px;
+    }
+
+    .feature p {
+      margin-top: 7px;
+      font-size: 11px;
+      color: #8b93a7;
+    }
+
+    .footer {
+      margin-top: auto;
+      padding-top: 30px;
+      text-align: center;
+      color: #596275;
+      font-size: 12px;
+    }
+  </style>
 </head>
 
 <body>
 
-  <h1>📹 Video Call</h1>
+  <main class="app">
 
-  <video id="localVideo" autoplay muted playsinline
-         style="width:90%;max-width:500px;"></video>
+    <div class="top">
+      <div class="logo">Home Call</div>
 
-  <br><br>
+      <div class="online">
+        <div class="dot"></div>
+        Online
+      </div>
+    </div>
 
-  <button onclick="startCamera()">📷 Nyalakan Kamera</button>
-  <button onclick="stopCamera()">❌ Matikan Kamera</button>
+    <section class="welcome">
+      <small>Selamat datang 👋</small>
+
+      <h1>
+        Hubungi<br>
+        saya sekarang.
+      </h1>
+
+      <p>
+        Tekan tombol di bawah untuk memulai
+        panggilan video.
+      </p>
+    </section>
+
+    <section class="call-card">
+
+      <div class="camera">
+        📹
+      </div>
+
+      <h2>Video Call</h2>
+
+      <p>
+        Kamera dan mikrofon siap digunakan.
+      </p>
+
+      <button class="call-button" onclick="startCall()">
+        📞 Mulai Video Call
+      </button>
+
+    </section>
+
+    <section class="features">
+
+      <div class="feature">
+        <span>🎥</span>
+        <p>Video</p>
+      </div>
+
+      <div class="feature">
+        <span>🎙️</span>
+        <p>Audio</p>
+      </div>
+
+      <div class="feature">
+        <span>🔒</span>
+        <p>Aman</p>
+      </div>
+
+    </section>
+
+    <div class="footer">
+      Home Call • Video Communication
+    </div>
+
+  </main>
 
   <script>
-    let stream = null;
-
-    async function startCamera() {
-      try {
-        stream = await navigator.mediaDevices.getUserMedia({
-          video: true,
-          audio: true
-        });
-
-        document.getElementById("localVideo").srcObject = stream;
-
-      } catch (error) {
-        alert("Tidak bisa membuka kamera: " + error.message);
-      }
-    }
-
-    function stopCamera() {
-      if (stream) {
-        stream.getTracks().forEach(track => track.stop());
-        stream = null;
-      }
-
-      document.getElementById("localVideo").srcObject = null;
+    function startCall() {
+      alert("Fitur Video Call akan segera dimulai.");
     }
   </script>
 
