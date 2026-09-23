@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Home Call - Pemilik</title>
+
+  <script src="https://cdn.jsdelivr.net/npm/peerjs@1.5.5/dist/peerjs.min.js"></script>
+
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background: #080b12;
+      color: white;
+      font-family: Arial, sans-serif;
+      min-height: 100vh;
+    }
+
+    .app {
+      max-width: 500px;
+      margin: auto;
+      padding: 25px 20px;
+    }
+
+    h1 {
+      margin-bottom: 8px;
+    }
+
+    .status {
+      color: #22c55e;
+      margin-bottom: 25px;
+    }
+
+    .card {
+      background: #111722;
+      border: 1px solid #202938;
+      border-radius: 22px;
+      padding: 20px;
+      margin-bottom: 15px;
+    }
+
+    #incoming {
+      display: none;
+      text-align: center;
+    }
+
+    button {
+      width: 100%;
+      padding: 16px;
+      border: 0;
+      border-radius: 14px;
+      margin-top: 10px;
+      font-size: 16px;
+      font-weight: bold;
+    }
+
+    .green {
+      background: #16a34a;
+      color: white;
+    }
+
+    .red {
+      background: #dc2626;
+      color: white;
+    }
+
+    video {
+      width: 100%;
+      background: #000;
+      border-radius: 15px;
+      margin-top: 10px;
+    }
+
+    #callArea {
+      display: none;
+    }
+
+    .waiting {
+      text-align: center;
+      padding: 35px 10px;
+      font-size: 45px;
+    }
+  </style>
+</head>
+
+<body>
+
+<div class="app">
+
+  <h1>🏠 Home Call</h1>
+  <div class="status" id="status">Menghubungkan...</div>
+
+  <div class="card" id="waiting">
+    <div class="waiting">📞</div>
+    <h2 style="text-align:center;">Menunggu panggilan</h2>
+  </div>
+
+  <div class="card" id="incoming">
+
+    <div class="waiting">📲</div>
+
+    <h2>Panggilan Masuk!</h2>
+
+    <p style="margin-top:10px;">
+      Ada tamu yang ingin melakukan video call.
+    </p>
+
+    <button class="green" onclick="answerCall()">
+      ✅ Terima Panggilan
+    </button>
+
+    <button class="red" onclick="rejectCall()">
+      ❌ Tolak
+    </button>
+
+  </div>
+
+  <div class="card" id="callArea">
+
+    <h2>🎥 Video Call</h2>
+
+    <video id="remoteVideo"
+           autoplay
+           playsinline></video>
+
+    <video id="localVideo"
+           autoplay
+           muted
+           playsinline></video>
+
+    <button class="red" onclick="endCall()">
+      🔴 Akhiri Panggilan
+    </button>
+
+  </div>
+
+</div>
+
+<script>
+
+  let peer;
+  let incomingCall = null;
+  let currentCall = null;
+  let localStream = null;
+
+  // ID KHUSUS PEMILIK
+  peer = new Peer("homecall-owner-2026");
+
+  peer.on("open", function(id) {
+
+    document.getElementById("status").textContent =
+      "🟢 Pemilik Online";
+
+  });
+
+  // Ada tamu menelepon
+  peer.on("call", function(call) {
+
+    incomingCall = call;
+
+    document.getElementById("waiting").style.display =
+      "none";
+
+    document.getElementById("incoming").style.display =
+      "block";
+
+  });
+
+  peer.on("error", function(error) {
+
+    console.log(error);
+
+    document.getElementById("status").textContent =
+      "🔴 Koneksi bermasalah";
+
+  });
+
+
+  async function answerCall() {
+
+    try {
+
+      localStream =
+        await navigator.mediaDevices.getUserMedia({
+          video: true,
+          audio: true
+        });
+
+      document.getElementById("localVideo").srcObject =
+        localStream;
+
+      incomingCall.answer(localStream);
+
+      currentCall = incomingCall;
+
+      incomingCall = null;
+
+      document.getElementById("incoming").style.display =
+        "none";
+
+      document.getElementById("callArea").style.display =
+        "block";
+
+
+      currentCall.on("stream", function(remoteStream) {
+
+        document.getElementById("remoteVideo").srcObject =
+          remoteStream;
+
+      });
+
+      currentCall.on("close", endCall);
+
+    } catch (error) {
+
+      alert(
+        "Kamera atau mikrofon tidak bisa digunakan."
+      );
+
+    }
+
+  }
+
+
+  function rejectCall() {
+
+    if (incomingCall) {
+
+      incomingCall.close();
+      incomingCall = null;
+
+    }
+
+    document.getElementById("incoming").style.display =
+      "none";
+
+    document.getElementById("waiting").style.display =
+      "block";
+
+  }
+
+
+  function endCall() {
+
+    if (currentCall) {
+      currentCall.close();
+      currentCall = null;
+    }
+
+    if (localStream) {
+
+      localStream.getTracks().forEach(function(track) {
+        track.stop();
+      });
+
+      localStream = null;
+    }
+
+    document.getElementById("remoteVideo").srcObject =
+      null;
+
+    document.getElementById("localVideo").srcObject =
+      null;
+
+    document.getElementById("callArea").style.display =
+      "none";
+
+    document.getElementById("waiting").style.display =
+      "block";
+
+  }
+
+</script>
+
+</body>
+</html>
