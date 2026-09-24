@@ -79,11 +79,9 @@
       height: 180px;
       background: #080b12;
       border-radius: 20px;
-
       display: flex;
       justify-content: center;
       align-items: center;
-
       font-size: 65px;
       margin-bottom: 22px;
     }
@@ -103,16 +101,12 @@
       width: 100%;
       padding: 17px;
       margin-top: 22px;
-
       border: none;
       border-radius: 15px;
-
       background: #2563eb;
       color: white;
-
       font-size: 17px;
       font-weight: bold;
-
       cursor: pointer;
     }
 
@@ -130,7 +124,6 @@
     .feature {
       padding: 15px 8px;
       text-align: center;
-
       background: #111722;
       border: 1px solid #202938;
       border-radius: 16px;
@@ -155,19 +148,17 @@
       background: #000;
       border-radius: 15px;
       margin-top: 10px;
+      transform: none;
     }
 
     .end-button {
       width: 100%;
       padding: 16px;
       margin-top: 15px;
-
       border: none;
       border-radius: 15px;
-
       background: #dc2626;
       color: white;
-
       font-size: 16px;
       font-weight: bold;
     }
@@ -197,7 +188,6 @@
 
   </div>
 
-
   <div id="home">
 
     <section class="welcome">
@@ -217,7 +207,6 @@
       </p>
 
     </section>
-
 
     <section class="call-card">
 
@@ -244,7 +233,6 @@
 
     </section>
 
-
     <section class="features">
 
       <div class="feature">
@@ -265,7 +253,6 @@
     </section>
 
   </div>
-
 
   <div class="call-card" id="callArea">
 
@@ -296,13 +283,11 @@
 
   </div>
 
-
   <div class="footer">
     Home Call • Video Communication
   </div>
 
 </div>
-
 
 <script>
 
@@ -310,19 +295,16 @@
   let currentCall = null;
   let localStream = null;
 
-
-  // Membuat ID penelpon secara otomatis
   peer = new Peer({
     debug: 3,
     config: {
-        iceServers: [
-            {
-                urls: "stun:stun.l.google.com:19302"
-            }
-        ]
+      iceServers: [
+        {
+          urls: "stun:stun.l.google.com:19302"
+        }
+      ]
     }
-});
-
+  });
 
   peer.on("open", function(id) {
 
@@ -330,7 +312,6 @@
       "🟢 Online";
 
   });
-
 
   peer.on("error", function(error) {
 
@@ -345,29 +326,26 @@
 
   });
 
-
   async function startCall() {
 
     try {
 
       localStream =
         await navigator.mediaDevices.getUserMedia({
-
-          video: true,
+          video: {
+            facingMode: {
+              ideal: "user"
+            }
+          },
           audio: true
-
         });
 
+      const localVideo =
+        document.getElementById("localVideo");
 
-      document.getElementById("localVideo").srcObject =
-        localStream;
+      localVideo.srcObject = localStream;
 
-
-      /*
-        ID PEMILIK
-
-        Harus sama dengan ID di owner.html
-      */
+      await localVideo.play().catch(function() {});
 
       currentCall =
         peer.call(
@@ -375,36 +353,34 @@
           localStream
         );
 
-
       document.getElementById("home").style.display =
         "none";
-
 
       document.getElementById("callArea").style.display =
         "block";
 
-
       document.getElementById("status").textContent =
         "📞 Memanggil...";
 
-
       currentCall.on("stream", function(remoteStream) {
 
-        document.getElementById("remoteVideo").srcObject =
-          remoteStream;
+        const remoteVideo =
+          document.getElementById("remoteVideo");
+
+        remoteVideo.srcObject = remoteStream;
+
+        remoteVideo.play().catch(function() {});
 
         document.getElementById("status").textContent =
           "🟢 Terhubung";
 
       });
 
-
       currentCall.on("close", function() {
 
         endCall();
 
       });
-
 
       currentCall.on("error", function(error) {
 
@@ -416,8 +392,9 @@
 
       });
 
-
     } catch (error) {
+
+      console.log(error);
 
       alert(
         "Kamera atau mikrofon tidak bisa digunakan.\n\n" +
@@ -428,7 +405,6 @@
 
   }
 
-
   function endCall() {
 
     if (currentCall) {
@@ -438,7 +414,6 @@
       currentCall = null;
 
     }
-
 
     if (localStream) {
 
@@ -452,21 +427,17 @@
 
     }
 
-
     document.getElementById("localVideo").srcObject =
       null;
 
     document.getElementById("remoteVideo").srcObject =
       null;
 
-
     document.getElementById("callArea").style.display =
       "none";
 
-
     document.getElementById("home").style.display =
       "block";
-
 
     document.getElementById("status").textContent =
       "🟢 Online";
