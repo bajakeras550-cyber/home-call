@@ -82,10 +82,12 @@ button {
     background: black;
     border-radius: 18px;
     object-fit: cover;
-    transform: scaleX(1);
+
+    /* TIDAK MIRROR */
+    transform: none;
 }
 
-    #localVideo {
+#localVideo {
     position: absolute;
     right: 15px;
     bottom: 15px;
@@ -96,9 +98,9 @@ button {
     border-radius: 12px;
     object-fit: cover;
 
-    /* MATIKAN EFEK MIRROR */
-    transform: scaleX(1);
-    }
+    /* TIDAK MIRROR */
+    transform: none;
+}
 
 #message {
     margin: 15px;
@@ -111,13 +113,16 @@ button {
 
 <header>
     <h1>🏠 Home Call</h1>
+
     <div class="status" id="status">
         Menghubungkan ke server...
     </div>
 </header>
 
 <div id="incoming">
+
     <h2>📞 Panggilan Masuk</h2>
+
     <p>Seseorang sedang menelepon.</p>
 
     <button class="accept" id="acceptBtn">
@@ -127,6 +132,7 @@ button {
     <button class="reject" id="rejectBtn">
         Tolak
     </button>
+
 </div>
 
 <div id="message"></div>
@@ -181,7 +187,7 @@ const message = document.getElementById("message");
 // ===============================
 // BUAT PEER OWNER
 // ===============================
- 
+
 peer = new Peer(OWNER_ID, {
     debug: 3,
     config: {
@@ -193,6 +199,7 @@ peer = new Peer(OWNER_ID, {
     }
 });
 
+
 // ===============================
 // PEER TERHUBUNG
 // ===============================
@@ -201,7 +208,8 @@ peer.on("open", function(id) {
 
     console.log("Owner online:", id);
 
-    status.innerText = "🟢 Owner online — menunggu panggilan";
+    status.innerText =
+        "🟢 Owner online — menunggu panggilan";
 
 });
 
@@ -218,7 +226,8 @@ peer.on("call", function(call) {
 
     incoming.style.display = "block";
 
-    status.innerText = "📞 Ada panggilan masuk";
+    status.innerText =
+        "📞 Ada panggilan masuk";
 
 });
 
@@ -233,31 +242,52 @@ acceptBtn.onclick = async function() {
 
     try {
 
-        message.innerText = "Meminta izin kamera dan mikrofon...";
+        message.innerText =
+            "Meminta izin kamera dan mikrofon...";
 
-        localStream = await navigator.mediaDevices.getUserMedia({
-            video: true,
-            audio: true
-        });
+
+        // ===============================
+        // KAMERA DEPAN
+        // ===============================
+
+        localStream =
+            await navigator.mediaDevices.getUserMedia({
+                video: {
+                    facingMode: "user"
+                },
+                audio: true
+            });
+
 
         console.log("Kamera Owner aktif");
 
-        // Tampilkan kamera Owner sendiri
+
+        // ===============================
+        // TAMPILKAN KAMERA OWNER
+        // ===============================
+
         localVideo.srcObject = localStream;
 
-        await localVideo.play().catch(() => {});
+        await localVideo.play().catch(function() {});
 
-        // Jawab panggilan
+
+        // ===============================
+        // JAWAB PANGGILAN
+        // ===============================
+
         incomingCall.answer(localStream);
 
         console.log("Panggilan dijawab");
 
+
         incoming.style.display = "none";
+
         callArea.style.display = "block";
 
         status.innerText = "🟢 Terhubung";
 
-        message.innerText = "Menunggu video dari penelpon...";
+        message.innerText =
+            "Menunggu video dari penelpon...";
 
 
         // ===============================
@@ -272,14 +302,18 @@ acceptBtn.onclick = async function() {
 
             remoteVideo.play().catch(function(error) {
 
-                console.log("Video belum autoplay:", error);
+                console.log(
+                    "Video belum autoplay:",
+                    error
+                );
 
                 message.innerText =
                     "Tekan video untuk memulai pemutaran.";
 
             });
 
-            message.innerText = "🟢 Video terhubung";
+            message.innerText =
+                "🟢 Video terhubung";
 
         });
 
@@ -304,7 +338,8 @@ acceptBtn.onclick = async function() {
             console.error(error);
 
             message.innerText =
-                "❌ Koneksi video gagal: " + error.type;
+                "❌ Koneksi video gagal: " +
+                error.type;
 
         });
 
@@ -381,6 +416,7 @@ function endCall() {
     }
 
     remoteVideo.srcObject = null;
+
     localVideo.srcObject = null;
 
     callArea.style.display = "none";
