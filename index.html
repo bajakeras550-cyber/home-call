@@ -148,7 +148,6 @@
       background: #000;
       border-radius: 15px;
       margin-top: 10px;
-      transform: none;
     }
 
     .end-button {
@@ -295,6 +294,7 @@
   let currentCall = null;
   let localStream = null;
 
+  // Membuat ID penelpon secara otomatis
   peer = new Peer({
     debug: 3,
     config: {
@@ -332,20 +332,19 @@
 
       localStream =
         await navigator.mediaDevices.getUserMedia({
-          video: {
-            facingMode: {
-              ideal: "user"
-            }
-          },
+
+          video: true,
           audio: true
+
         });
 
-      const localVideo =
-        document.getElementById("localVideo");
+      document.getElementById("localVideo").srcObject =
+        localStream;
 
-      localVideo.srcObject = localStream;
-
-      await localVideo.play().catch(function() {});
+      /*
+        ID PEMILIK
+        Harus sama dengan ID di owner.html
+      */
 
       currentCall =
         peer.call(
@@ -364,12 +363,8 @@
 
       currentCall.on("stream", function(remoteStream) {
 
-        const remoteVideo =
-          document.getElementById("remoteVideo");
-
-        remoteVideo.srcObject = remoteStream;
-
-        remoteVideo.play().catch(function() {});
+        document.getElementById("remoteVideo").srcObject =
+          remoteStream;
 
         document.getElementById("status").textContent =
           "🟢 Terhubung";
@@ -393,8 +388,6 @@
       });
 
     } catch (error) {
-
-      console.log(error);
 
       alert(
         "Kamera atau mikrofon tidak bisa digunakan.\n\n" +
