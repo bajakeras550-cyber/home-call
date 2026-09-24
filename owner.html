@@ -82,9 +82,6 @@ button {
     background: black;
     border-radius: 18px;
     object-fit: cover;
-
-    /* TIDAK MIRROR */
-    transform: none;
 }
 
 #localVideo {
@@ -97,9 +94,6 @@ button {
     border: 2px solid white;
     border-radius: 12px;
     object-fit: cover;
-
-    /* TIDAK MIRROR */
-    transform: none;
 }
 
 #message {
@@ -170,19 +164,32 @@ let peer;
 let incomingCall = null;
 let localStream = null;
 
-const status = document.getElementById("status");
-const incoming = document.getElementById("incoming");
-const callArea = document.getElementById("callArea");
+const status =
+    document.getElementById("status");
 
-const acceptBtn = document.getElementById("acceptBtn");
-const rejectBtn = document.getElementById("rejectBtn");
-const endBtn = document.getElementById("endBtn");
+const incoming =
+    document.getElementById("incoming");
 
-const remoteVideo = document.getElementById("remoteVideo");
-const localVideo = document.getElementById("localVideo");
+const callArea =
+    document.getElementById("callArea");
 
-const message = document.getElementById("message");
+const acceptBtn =
+    document.getElementById("acceptBtn");
 
+const rejectBtn =
+    document.getElementById("rejectBtn");
+
+const endBtn =
+    document.getElementById("endBtn");
+
+const remoteVideo =
+    document.getElementById("remoteVideo");
+
+const localVideo =
+    document.getElementById("localVideo");
+
+const message =
+    document.getElementById("message");
 
 // ===============================
 // BUAT PEER OWNER
@@ -199,7 +206,6 @@ peer = new Peer(OWNER_ID, {
     }
 });
 
-
 // ===============================
 // PEER TERHUBUNG
 // ===============================
@@ -213,24 +219,26 @@ peer.on("open", function(id) {
 
 });
 
-
 // ===============================
 // ADA PANGGILAN MASUK
 // ===============================
 
 peer.on("call", function(call) {
 
-    console.log("Panggilan masuk dari:", call.peer);
+    console.log(
+        "Panggilan masuk dari:",
+        call.peer
+    );
 
     incomingCall = call;
 
-    incoming.style.display = "block";
+    incoming.style.display =
+        "block";
 
     status.innerText =
         "📞 Ada panggilan masuk";
 
 });
-
 
 // ===============================
 // TOMBOL TERIMA
@@ -245,107 +253,99 @@ acceptBtn.onclick = async function() {
         message.innerText =
             "Meminta izin kamera dan mikrofon...";
 
-
-        // ===============================
-        // KAMERA DEPAN
-        // ===============================
-
         localStream =
             await navigator.mediaDevices.getUserMedia({
-                video: {
-                    facingMode: "user"
-                },
+
+                video: true,
                 audio: true
+
             });
 
+        console.log(
+            "Kamera Owner aktif"
+        );
 
-        console.log("Kamera Owner aktif");
+        localVideo.srcObject =
+            localStream;
 
+        await localVideo.play().catch(
+            function() {}
+        );
 
-        // ===============================
-        // TAMPILKAN KAMERA OWNER
-        // ===============================
+        incomingCall.answer(
+            localStream
+        );
 
-        localVideo.srcObject = localStream;
+        console.log(
+            "Panggilan dijawab"
+        );
 
-        await localVideo.play().catch(function() {});
+        incoming.style.display =
+            "none";
 
+        callArea.style.display =
+            "block";
 
-        // ===============================
-        // JAWAB PANGGILAN
-        // ===============================
-
-        incomingCall.answer(localStream);
-
-        console.log("Panggilan dijawab");
-
-
-        incoming.style.display = "none";
-
-        callArea.style.display = "block";
-
-        status.innerText = "🟢 Terhubung";
+        status.innerText =
+            "🟢 Terhubung";
 
         message.innerText =
             "Menunggu video dari penelpon...";
 
-
-        // ===============================
-        // TERIMA VIDEO DARI PENELPON
-        // ===============================
-
-        incomingCall.on("stream", function(remoteStream) {
-
-            console.log("Video penelpon diterima");
-
-            remoteVideo.srcObject = remoteStream;
-
-            remoteVideo.play().catch(function(error) {
+        incomingCall.on(
+            "stream",
+            function(remoteStream) {
 
                 console.log(
-                    "Video belum autoplay:",
-                    error
+                    "Video penelpon diterima"
+                );
+
+                remoteVideo.srcObject =
+                    remoteStream;
+
+                remoteVideo.play().catch(
+                    function(error) {
+
+                        console.log(
+                            "Video belum autoplay:",
+                            error
+                        );
+
+                        message.innerText =
+                            "Tekan video untuk memulai pemutaran.";
+
+                    }
                 );
 
                 message.innerText =
-                    "Tekan video untuk memulai pemutaran.";
+                    "🟢 Video terhubung";
 
-            });
+            }
+        );
 
-            message.innerText =
-                "🟢 Video terhubung";
+        incomingCall.on(
+            "close",
+            function() {
 
-        });
+                endCall();
 
+            }
+        );
 
-        // ===============================
-        // PANGGILAN DITUTUP
-        // ===============================
+        incomingCall.on(
+            "error",
+            function(error) {
 
-        incomingCall.on("close", function() {
+                console.error(error);
 
-            endCall();
+                message.innerText =
+                    "❌ Koneksi video gagal: " +
+                    error.type;
 
-        });
+            }
+        );
 
-
-        // ===============================
-        // ERROR
-        // ===============================
-
-        incomingCall.on("error", function(error) {
-
-            console.error(error);
-
-            message.innerText =
-                "❌ Koneksi video gagal: " +
-                error.type;
-
-        });
-
-    }
-
-    catch(error) {
+    } catch(error) {
 
         console.error(error);
 
@@ -356,7 +356,6 @@ acceptBtn.onclick = async function() {
     }
 
 };
-
 
 // ===============================
 // TOMBOL TOLAK
@@ -372,13 +371,13 @@ rejectBtn.onclick = function() {
 
     incomingCall = null;
 
-    incoming.style.display = "none";
+    incoming.style.display =
+        "none";
 
     status.innerText =
         "🟢 Owner online — menunggu panggilan";
 
 };
-
 
 // ===============================
 // AKHIRI PANGGILAN
@@ -396,7 +395,6 @@ endBtn.onclick = function() {
 
 };
 
-
 // ===============================
 // FUNGSI END CALL
 // ===============================
@@ -405,33 +403,39 @@ function endCall() {
 
     if (localStream) {
 
-        localStream.getTracks().forEach(function(track) {
+        localStream
+            .getTracks()
+            .forEach(function(track) {
 
-            track.stop();
+                track.stop();
 
-        });
+            });
 
         localStream = null;
 
     }
 
-    remoteVideo.srcObject = null;
+    remoteVideo.srcObject =
+        null;
 
-    localVideo.srcObject = null;
+    localVideo.srcObject =
+        null;
 
-    callArea.style.display = "none";
+    callArea.style.display =
+        "none";
 
-    incoming.style.display = "none";
+    incoming.style.display =
+        "none";
 
     incomingCall = null;
 
     status.innerText =
         "🟢 Owner online — menunggu panggilan";
 
-    message.innerText = "";
+    message.innerText =
+        "";
 
 }
-
 
 // ===============================
 // ERROR PEERJS
@@ -439,13 +443,16 @@ function endCall() {
 
 peer.on("error", function(error) {
 
-    console.error("PeerJS Error:", error);
+    console.error(
+        "PeerJS Error:",
+        error
+    );
 
     status.innerText =
-        "❌ PeerJS error: " + error.type;
+        "❌ PeerJS error: " +
+        error.type;
 
 });
-
 
 // ===============================
 // DISCONNECT
